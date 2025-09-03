@@ -1,0 +1,32 @@
+{
+  "name": "projectnewbkeand",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Mohitsm/projectnewbkeand#readme",
+  "bugs": {
+    "url": "https://github.com/Mohitsm/projectnewbkeand/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mohitsm/projectnewbkeand.git"
+  },
+  "license": "ISC",
+  "author": "mohit",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.56.1",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "keywords": []
+}
