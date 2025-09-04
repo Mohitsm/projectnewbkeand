@@ -23,7 +23,7 @@ app.use(express.json());
 // Enable CORS
 app.use(
   cors({
-   origin: ["http://localhost:3000", "http://localhost:5173","http://localhost:8080"],
+   origin: ["http://localhost:3000", "http://localhost:5173","http://localhost:8080","https://capable-ganache-c885a7.netlify.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
