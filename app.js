@@ -5,6 +5,8 @@ import connectDB from "./config/db.js";
 import errorHandler from "./middleware/errorMiddleware.js";
 import authRoutes from "./routes/authRoutes.js";
 import selectionSummaryRoutes from "./routes/selectionSummary.routes.js";
+import applicationRoutes from "./routes/application.routes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +32,9 @@ app.use(
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/selection-summaries", selectionSummaryRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/bookings", bookingRoutes);
+
 
 // Root route
 app.get("/", (req, res) => {

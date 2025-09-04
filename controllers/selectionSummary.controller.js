@@ -57,3 +57,53 @@ export const deleteSummary = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Calculate estimated cost
+export const calculateSummary = (req, res) => {
+  try {
+    const { businessActivities, shareholders, totalVisas, tenure, entityType, zoneType } = req.body;
+
+    // simple dummy calculation – adjust as needed
+    const baseCost = 5000;
+    const activityCost = (businessActivities?.length || 0) * 1000;
+    const shareholderCost = shareholders * 2000;
+    const visaCost = totalVisas * 1500;
+    const tenureCost = parseInt(tenure, 10) * 500;
+    const entityCost = entityType === "LLC" ? 3000 : 2000;
+    const zoneCost = zoneType === "freezone" ? 1000 : 2000;
+
+    const estimatedCost = baseCost + activityCost + shareholderCost + visaCost + tenureCost + entityCost + zoneCost;
+
+    const recommendedPackage = {
+      name: "Standard Package",
+      price: estimatedCost,
+      features: ["Basic registration", "1-year license", "Standard support"]
+    };
+
+    const alternativePackages = [
+      { name: "Premium Package", price: estimatedCost + 5000, features: ["Faster setup", "Extra visa", "Premium support"] },
+      { name: "Budget Package", price: estimatedCost - 2000, features: ["Basic support only", "Limited activities"] }
+    ];
+
+    const costBreakdown = {
+      baseCost,
+      activityCost,
+      shareholderCost,
+      visaCost,
+      tenureCost,
+      entityCost,
+      zoneCost
+    };
+
+    res.json({
+      estimatedCost,
+      recommendedPackage,
+      alternativePackages,
+      costBreakdown,
+      isFreezone: zoneType?.toLowerCase() === "freezone"
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
