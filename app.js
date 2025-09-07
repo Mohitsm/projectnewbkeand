@@ -40,6 +40,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:8080",
       "https://capable-ganache-c885a7.netlify.app",
+      "https://dapper-cascaron-2796d3.netlify.app"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
