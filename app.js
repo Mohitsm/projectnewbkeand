@@ -62,24 +62,24 @@ app.use("/api/growthbookings", growthBookingRoutes);
 app.use("/api/growthservices", growthServiceRoutes);
 
 // ✅ Stripe Integration
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-app.post("/api/create-payment-intent", async (req, res) => {
-  const { amount } = req.body; // amount in paise
+// app.post("/api/create-payment-intent", async (req, res) => {
+//   const { amount } = req.body; // amount in paise
 
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "inr",
-      payment_method_types: ["card"], // card payments only
-    });
+//   try {
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount,
+//       currency: "inr",
+//       payment_method_types: ["card"], // card payments only
+//     });
 
-    res.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error) {
-    console.error("Stripe error:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
+//     res.json({ clientSecret: paymentIntent.client_secret });
+//   } catch (error) {
+//     console.error("Stripe error:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 // Root route
 app.get("/", (req, res) => {
