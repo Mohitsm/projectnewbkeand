@@ -90,52 +90,65 @@ export const deleteCategory = async (req, res) => {
 
 
 // Excel upload controller
-// Excel upload controller
+// Adjust path if needed
+
+
 export const uploadExcel = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // Read Excel
-    const workbook = XLSX.readFile(req.file.path);   // ✅ use XLSX (capital)
+    // Read Excel file
+    const workbook = XLSX.readFile(req.file.path);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = XLSX.utils.sheet_to_json(sheet);
+    const rows = XLSX.utils.sheet_to_json(sheet);
 
-    // Group by category
     const grouped = {};
-    data.forEach((row) => {
-      const categoryName = row.Category?.trim();
+
+    // Group services by Category name
+    rows.forEach((row) => {
+      if (!row || !row.Category) return;
+
+      const categoryName = row.Category.trim();
       if (!categoryName) return;
 
-      if (!grouped[categoryName]) {
-        grouped[categoryName] = [];
-      }
+      if (!grouped[categoryName]) grouped[categoryName] = [];
 
       grouped[categoryName].push({
         name: row["Service Name"] || "",
         fees: row.Fees || "",
+        b2bCosting: row.b2bCosting || "",  // Save as string as per your schema
         internalTimeline: row.InternalTimeline || "",
         externalTimeline: row.ExternalTimeline || "",
-        documentsRequired: row.DocumentsRequired || "",
+        documentsRequired: row.DocumentsRequired || ""
       });
     });
 
-    // Save categories with services
+    // Pre-fetch existing categories
+    const existingCategories = await Category.find({});
+    const categoryMap = existingCategories.reduce((map, cat) => {
+      map[cat.name] = cat;
+      return map;
+    }, {});
+
+    // Save categories and services
     for (const [categoryName, services] of Object.entries(grouped)) {
-      let category = await Category.findOne({ name: categoryName });
+      let category = categoryMap[categoryName];
+
       if (category) {
-        category.services = services; // overwrite old services
+        category.services = services;  // Overwrite old services
         await category.save();
       } else {
         await Category.create({ name: categoryName, services });
       }
     }
 
-    res.json({ message: "Excel data uploaded successfully" });
+    res.json({ message: "Excel uploaded and categories saved successfully" });
   } catch (error) {
-    console.error("Excel upload error:", error);
+    console.error("Excel upload error:", error.stack);
     res.status(500).json({ message: "Failed to upload Excel", error: error.message });
   }
 };
+
 
