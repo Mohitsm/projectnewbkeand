@@ -4,6 +4,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
+import bodyParser from "body-parser";
 
 // Local imports
 import connectDB from "./config/db.js";
@@ -19,6 +20,7 @@ import bookingsRouter from "./routes/bookings.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import growthServiceRoutes from "./routes/growthServiceRoutes.js";
 import growthBookingRoutes from "./routes/growthBookingRoutes.js";
+import businessSetupRoutes from "./routes/businessSetupRoutes.js";
 // Load environment variables
 dotenv.config();
 
@@ -47,6 +49,8 @@ app.use(
   })
 );
 
+app.use(bodyParser.json());
+
 // Static serving for uploaded files
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,24 +65,26 @@ app.use("/api/bookings", bookingsRouter);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/growthbookings", growthBookingRoutes);
 app.use("/api/growthservices", growthServiceRoutes);
+app.use("/api/business-setups", businessSetupRoutes);
 
 // ✅ Stripe Integration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-app.post("/api/create-payment-intent", async (req, res) => {
-  const { amount } = req.body; // amount in paise
-
+app.post("/create-payment-intent", async (req, res) => {
   try {
+    const { amount, currency = "aed" } = req.body;
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
-      currency: "inr",
-      payment_method_types: ["card"], // card payments only
+      currency,
     });
 
-    res.json({ clientSecret: paymentIntent.client_secret });
+    res.status(200).send({
+      clientSecret: paymentIntent.client_secret,
+    });
   } catch (error) {
-    console.error("Stripe error:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error creating payment intent:", error);
+    res.status(500).send({ error: error.message });
   }
 });
 
