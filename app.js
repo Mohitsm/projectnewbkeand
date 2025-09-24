@@ -21,6 +21,9 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import growthServiceRoutes from "./routes/growthServiceRoutes.js";
 import growthBookingRoutes from "./routes/growthBookingRoutes.js";
 import businessSetupRoutes from "./routes/businessSetupRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import tradingRoutes from "./routes/tradingRoutes.js";
+
 // Load environment variables
 dotenv.config();
 
@@ -66,25 +69,33 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/growthbookings", growthBookingRoutes);
 app.use("/api/growthservices", growthServiceRoutes);
 app.use("/api/business-setups", businessSetupRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/tradings", tradingRoutes);
 
 // ✅ Stripe Integration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-app.post("/create-payment-intent", async (req, res) => {
+app.post("/api/create-payment-intent", async (req, res) => {
   try {
-    const { amount, currency = "aed" } = req.body;
+    const { amount, currency } = req.body;
+
+    if (!amount) {
+      return res.status(400).json({ error: "Amount is required" });
+    }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency,
+      amount: amount * 100, // Stripe expects smallest currency unit (fils/cents)
+      currency: currency || "aed",
+      payment_method_types: ["card"],
     });
 
-    res.status(200).send({
+    res.json({
       clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id, // pass transaction ID
     });
-  } catch (error) {
-    console.error("Error creating payment intent:", error);
-    res.status(500).send({ error: error.message });
+  } catch (err) {
+    console.error("Payment Intent Error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
